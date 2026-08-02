@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="unsafe-url">
+<title>詞境 · 讓歌詞跟著影片跑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12141c;
+    --surface:#1b1e2a;
+    --surface-2:#242838;
+    --accent:#f2a93b;
+    --accent-dim:#8a672a;
+    --accent-2:#4fd1c5;
+    --text:#ededf5;
+    --text-dim:#767b94;
+    --line:rgba(255,255,255,0.08);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(242,169,59,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 8%, rgba(79,209,197,0.07), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+  }
+  a{color:inherit;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px;}
+
+  /* ---- nav ---- */
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 0;
+  }
+  .logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;}
+  .logo span{color:var(--accent);}
+  .nav-cta{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;
+    background:var(--accent);color:#1a1305;
+    padding:9px 16px;border-radius:9px;text-decoration:none;
+    transition:opacity .15s ease;
+  }
+  .nav-cta:hover{opacity:.9;}
+
+  /* ---- hero ---- */
+  .hero{padding:56px 0 40px;text-align:center;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
+    color:var(--accent-2);text-transform:uppercase;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:clamp(32px,5.6vw,54px);line-height:1.12;letter-spacing:-0.02em;
+    margin:14px 0 18px;
+  }
+  h1 em{font-style:normal;color:var(--accent);}
+  .hero p.sub{
+    max-width:520px;margin:0 auto 30px;color:var(--text-dim);font-size:15.5px;
+  }
+  .hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+  .btn-primary{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:14.5px;
+    background:var(--accent);color:#1a1305;border:1px solid var(--accent);
+    padding:13px 22px;border-radius:10px;text-decoration:none;
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  .btn-primary:hover{opacity:.92;}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-secondary{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:14.5px;
+    background:transparent;color:var(--text);border:1px solid var(--line);
+    padding:13px 22px;border-radius:10px;text-decoration:none;
+  }
+  .btn-secondary:hover{border-color:var(--accent-2);}
+  .fine-print{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-dim);}
+
+  /* ---- live demo (signature element) ---- */
+  .demo{
+    margin:44px auto 0;max-width:560px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 18px;text-align:left;
+  }
+  .demo-topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .demo-dot{width:8px;height:8px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);}
+  .demo-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:.08em;}
+  .demo-vinyl{
+    width:20px;height:20px;border-radius:50%;margin-left:auto;
+    background:radial-gradient(circle at center, var(--surface) 0 4px, transparent 4.5px),
+      repeating-radial-gradient(circle at center, #05060a 0 1.5px, #14161f 1.5px 3px);
+    border:1.5px solid var(--accent-dim);
+    animation:spin 2.4s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .demo-stage{height:110px;overflow:hidden;position:relative;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0, black 22%, black 78%, transparent 100%);
+            mask-image:linear-gradient(to bottom, transparent 0, black 22%, black 78%, transparent 100%);
+  }
+  .demo-line{
+    text-align:center;font-family:'Space Grotesk',sans-serif;color:var(--text-dim);
+    font-size:14px;padding:7px 0;transition:color .35s ease, font-size .35s ease, text-shadow .35s ease;
+  }
+  .demo-line.current{
+    color:var(--text);font-size:18px;font-weight:600;
+    text-shadow:0 0 16px rgba(242,169,59,0.45);
+  }
+  .demo-speedrow{display:flex;gap:6px;justify-content:center;margin-top:14px;}
+  .demo-chip{
+    font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 9px;border-radius:7px;
+    background:var(--surface-2);color:var(--text-dim);border:1px solid var(--line);
+  }
+  .demo-chip.active{background:var(--accent);color:#1a1305;border-color:var(--accent);font-weight:600;}
+
+  /* ---- features ---- */
+  .features{padding:64px 0 20px;}
+  .section-eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
+    color:var(--text-dim);text-transform:uppercase;margin-bottom:8px;text-align:center;
+  }
+  .section-title{
+    font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;
+    text-align:center;margin:0 0 40px;letter-spacing:-0.01em;
+  }
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media (max-width:760px){.feature-grid{grid-template-columns:1fr;}}
+  .feature-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 20px;
+  }
+  .feature-icon{
+    width:38px;height:38px;border-radius:10px;background:var(--surface-2);
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+    color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px;
+  }
+  .feature-card h3{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0 0 8px;}
+  .feature-card p{color:var(--text-dim);font-size:13.5px;margin:0;line-height:1.7;}
+
+  /* ---- steps ---- */
+  .steps{padding:60px 0;}
+  .step-list{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media (max-width:760px){.step-list{grid-template-columns:1fr;}}
+  .step{
+    border:1px solid var(--line);border-radius:var(--radius);padding:20px;
+    background:linear-gradient(180deg, var(--surface), var(--surface) 60%, var(--surface-2));
+    position:relative;
+  }
+  .step-num{
+    font-family:'JetBrains Mono',monospace;color:var(--accent-2);font-size:12px;
+    letter-spacing:.08em;margin-bottom:10px;display:block;
+  }
+  .step h4{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:0 0 6px;}
+  .step p{color:var(--text-dim);font-size:13px;margin:0;}
+
+  footer{
+    border-top:1px solid var(--line);margin-top:30px;padding:26px 0 40px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  }
+  footer .fine-print{font-size:11px;}
+
+  @media (prefers-reduced-motion: reduce){
+    .demo-vinyl{animation:none;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <div class="logo">詞境<span>.</span></div>
+    <a class="nav-cta" href="lyric-sync-player.html">開始使用</a>
+  </nav>
+
+  <section class="hero">
+    <div class="eyebrow">YOUTUBE × LYRIC SYNC</div>
+    <h1>讓每一句歌詞<br><em>準時</em>抵達</h1>
+    <p class="sub">貼上 YouTube 連結和 LRC 歌詞，影片播放到哪，歌詞就跟著捲到哪。想放慢練唱、加速複習都可以，速度怎麼調，歌詞永遠對得上。</p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="lyric-sync-player.html">立即開始使用 →</a>
+      <a class="btn-secondary" href="#features">看看有什麼功能</a>
+    </div>
+    <div class="fine-print">免費 · 不需登入 · 支援標準 LRC 歌詞格式</div>
+
+    <!-- signature live demo -->
+    <div class="demo" aria-hidden="true">
+      <div class="demo-topbar">
+        <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+        <span class="demo-label">LIVE PREVIEW</span>
+        <div class="demo-vinyl"></div>
+      </div>
+      <div class="demo-stage" id="demoStage">
+        <div class="demo-line">（示範文字）走到第一句</div>
+        <div class="demo-line current">（示範文字）目前這句會放大發光</div>
+        <div class="demo-line">（示範文字）接下來的一句</div>
+        <div class="demo-line">（示範文字）再下一句</div>
+      </div>
+      <div class="demo-speedrow">
+        <span class="demo-chip">0.5x</span><span class="demo-chip active">1x</span><span class="demo-chip">1.5x</span><span class="demo-chip">2x</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="section-eyebrow">功能</div>
+    <h2 class="section-title">練唱、聽歌、學語言都用得上</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">×</div>
+        <h3>0.25x – 2x 速度調整</h3>
+        <p>用預設按鈕快速切換，或用滑桿微調到剛好適合自己的速度，慢慢跟唱或加速複習都行。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">☰</div>
+        <h3>歌詞自動捲動</h3>
+        <p>貼上 LRC 格式歌詞，目前唱到的句子會自動置中放大，點一下任何一句還能直接跳到那個時間點。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">±</div>
+        <h3>同步微調</h3>
+        <p>歌詞跟影片對不準？用 ±0.5 秒的按鈕就能校正，不用重新編輯時間軸。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps">
+    <div class="section-eyebrow">使用方式</div>
+    <h2 class="section-title">三步驟開始</h2>
+    <div class="step-list">
+      <div class="step">
+        <span class="step-num">01</span>
+        <h4>貼上 YouTube 連結</h4>
+        <p>貼上網址或影片 ID，按下載入即可。</p>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <h4>貼上 LRC 歌詞</h4>
+        <p>格式為 [分:秒.毫秒] 文字，貼上後套用。</p>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <h4>開始播放</h4>
+        <p>調整速度、跟著捲動的歌詞一起唱。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo" style="font-size:14px;">詞境<span>.</span></div>
+    <div class="fine-print">播放速度不會改變歌詞判斷邏輯 — 一切都以影片實際時間軸為準</div>
+  </footer>
+</div>
+
+<script>
+  // cycle the "current" line in the live preview demo, purely illustrative
+  const lines = document.querySelectorAll('#demoStage .demo-line');
+  let active = 1;
+  setInterval(()=>{
+    lines[active].classList.remove('current');
+    active = (active + 1) % lines.length;
+    lines[active].classList.add('current');
+  }, 2200);
+</script>
+</body>
+</html>
